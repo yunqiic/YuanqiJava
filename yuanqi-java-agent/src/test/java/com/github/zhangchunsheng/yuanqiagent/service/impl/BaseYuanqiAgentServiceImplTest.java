@@ -42,6 +42,7 @@ public class BaseYuanqiAgentServiceImplTest {
         content.setType("text");
         content.setText("hello");
         List<Content> contents = new ArrayList<>();
+        contents.add(content);
         message.setContent(contents);
         messages.add(message);
         params.setMessages(messages);
