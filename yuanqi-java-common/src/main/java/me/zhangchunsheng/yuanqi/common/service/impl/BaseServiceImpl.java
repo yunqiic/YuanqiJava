@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,5 +55,32 @@ public abstract class BaseServiceImpl implements me.zhangchunsheng.yuanqi.common
     @Override
     public String getBaseUrl() {
         return this.getConfig().getBaseUrl();
+    }
+
+    /**
+     * 只要确保你的编码输入是正确的,就可以忽略掉 UnsupportedEncodingException
+     *
+     * @param source 参数
+     * @return String
+     */
+    public static String getUrlParams(Map<String, Object> source) {
+        Iterator<String> it = source.keySet().iterator();
+        StringBuilder paramStr = new StringBuilder();
+        while (it.hasNext()) {
+            String key = it.next();
+            String value = source.get(key).toString();
+            if (value.isEmpty()) {
+                continue;
+            }
+            try {
+                // URL 编码
+                value = URLEncoder.encode(value, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                // do nothing
+            }
+            paramStr.append("&").append(key).append("=").append(value);
+        }
+        // 去掉第一个&
+        return paramStr.substring(1);
     }
 }

@@ -33,7 +33,20 @@ public interface YuanqiService {
 
     public byte[] postForBytes(String url, String requestStr) throws YuanqiException;
 
+    /**
+     *
+     * @param url
+     * @param requestStr a=1&b=1
+     * @return
+     * @throws YuanqiException
+     */
     public String post(String url, String requestStr) throws YuanqiException;
+
+    public String post(String url, Map<String, Object> params) throws YuanqiException;
+
+    public String postJson(String url, String json) throws YuanqiException;
+
+    public String postJson(String url, String csrfToken, String session, String json) throws YuanqiException;
 
     public String get(String url) throws YuanqiException;
 
