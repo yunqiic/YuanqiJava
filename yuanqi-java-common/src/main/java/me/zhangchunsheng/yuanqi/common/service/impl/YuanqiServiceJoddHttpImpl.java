@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * 腾讯元器请求实现类，jodd-http实现.
@@ -61,6 +62,21 @@ public class YuanqiServiceJoddHttpImpl extends BaseServiceImpl {
             yuanqiApiData.set(new YuanqiApiData(url, requestStr, null, e.getMessage()));
             throw new YuanqiException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public String post(String url, Map<String, Object> params) throws YuanqiException {
+        return null;
+    }
+
+    @Override
+    public String postJson(String url, String json) throws YuanqiException {
+        return null;
+    }
+
+    @Override
+    public String postJson(String url, String source, String token, String json) throws YuanqiException {
+        return null;
     }
 
     @Override
