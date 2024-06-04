@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BaseYuanqiAgentServiceImplTest {
 
     @Inject
-    private com.github.zhangchunsheng.yuanqiagent.service.AgentService placeService;
+    private com.github.zhangchunsheng.yuanqiagent.service.AgentService agentService;
 
     @Test
     public void testChat() throws YuanqiException {
@@ -46,7 +46,7 @@ public class BaseYuanqiAgentServiceImplTest {
         message.setContent(contents);
         messages.add(message);
         params.setMessages(messages);
-        ChatRet result = this.placeService.chat(params);
+        ChatRet result = this.agentService.chat(params);
         System.out.println(result);
     }
 }

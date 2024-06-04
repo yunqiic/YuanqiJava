@@ -4,7 +4,7 @@ Yuanqi Java SDK
 ### 使用SDK
 ```java
 // spring boot, inject agentService
-AgentResult result = this.agentService.agent("北京市朝阳区阜通东大街6号");
+ChatRet result = this.agentService.chat(params);
 ```
 
 ### maven
@@ -13,42 +13,13 @@ AgentResult result = this.agentService.agent("北京市朝阳区阜通东大街6
 <dependency>
     <groupId>com.github.zhangchunsheng</groupId>
     <artifactId>yuanqi-java-agent</artifactId>
-    <version>1.0.1</version>
-</dependency>
-<dependency>
-    <groupId>com.github.zhangchunsheng</groupId>
-    <artifactId>yuanqi-java-agent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
-### 高德agent
+### 腾讯元器
 ```json
-{
-    "status" : "1",
-    "info" : "OK",
-    "infocode" : "10000",
-    "count" : "1",
-    "agentcodes" :
-    [
-        {
-        "formatted_address" : "北京市朝阳区阜通东大街|6号",
-        "country" : "中国",
-        "province" : "北京市",
-        "citycode" : "010",
-        "city" : "北京市",
-        "district" : "朝阳区",
-        "township" : [ ],
-        "neighborhood" :{},
-        "building" :{},
-        "adcode" : "110105",
-        "street" : "阜通东大街",
-        "number" : "6号",
-        "location" : "116.483038,39.990633",
-        "level" : "门牌号"
-        }
-    ]
-}
+{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"Hello! How can I help you today? Is there something specific you would like to discuss or ask about? I'm here to assist you.","steps":[{"role":"assistant","content":"Hello! How can I help you today? Is there something specific you would like to discuss or ask about? I'm here to assist you.","usage":{"prompt_tokens":7.0,"completion_tokens":30.0,"total_tokens":37.0},"time_cost":1660.0}]}}],"assistant_id":"NT61p8m6teGx","usage":{"prompt_tokens":7.0,"completion_tokens":30.0,"total_tokens":37.0},"id":"8814ab0e00504dfef53d2c9c71fea881","created":1717489568}
 ```
 
 <table border="0">
