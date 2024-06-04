@@ -178,10 +178,10 @@ public class YuanqiServiceApacheHttpImpl extends BaseServiceImpl {
     }
 
     @Override
-    public String postJson(String url, String csrfToken, String session, String requestStr) throws YuanqiException {
+    public String postJson(String url, String source, String token, String requestStr) throws YuanqiException {
         try {
             HttpClientBuilder httpClientBuilder = this.createHttpClientBuilder();
-            HttpPost httpPost = this.createHttpPostJson(url, csrfToken, session, requestStr);
+            HttpPost httpPost = this.createHttpPostJson(url, source, token, requestStr);
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
                 try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
                     String responseString = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
@@ -261,12 +261,12 @@ public class YuanqiServiceApacheHttpImpl extends BaseServiceImpl {
         return httpPost;
     }
 
-    private HttpPost createHttpPostJson(String url, String csrfToken, String session, String requestStr) {
+    private HttpPost createHttpPostJson(String url, String source, String token, String requestStr) {
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setHeader("X-CSRF-TOKEN", csrfToken);
-        httpPost.setHeader("Cookie", "ZSMART_LOCALE=zh; SESSION=" + session);
-        httpPost.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36");
+        httpPost.setHeader("X-Source", source);
+        httpPost.setHeader("Authorization", "Bearer " + token);
+        // httpPost.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36");
         StringEntity s = new StringEntity(requestStr, "utf-8");
         s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
                 "application/json"));

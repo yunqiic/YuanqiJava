@@ -46,7 +46,7 @@ public interface YuanqiService {
 
     public String postJson(String url, String json) throws YuanqiException;
 
-    public String postJson(String url, String csrfToken, String session, String json) throws YuanqiException;
+    public String postJson(String url, String source, String token, String json) throws YuanqiException;
 
     public String get(String url) throws YuanqiException;
 

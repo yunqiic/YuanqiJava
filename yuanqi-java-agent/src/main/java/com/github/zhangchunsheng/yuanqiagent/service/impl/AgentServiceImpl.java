@@ -21,7 +21,9 @@ import java.net.URLEncoder;
 public class AgentServiceImpl extends YuanqiServiceApacheHttpImpl implements AgentService {
     @Override
     public ChatRet chat(ChatParams params) throws YuanqiException {
-        String responseContent = this.post(this.getConfig().getBaseUrl() + YuanqiConstants.Url.chat, params.toString());
+        String url = this.getConfig().getBaseUrl() + YuanqiConstants.Url.chat;
+        String source = "openapi";
+        String responseContent = this.postJson(url, source, this.getConfig().getKey(), params.toString());
         return ChatRet.fromJson(responseContent);
     }
 }
