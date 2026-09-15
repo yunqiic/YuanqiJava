@@ -32,6 +32,7 @@ public class BaseYuanqiAgentServiceImplTest {
 
     @Test
     public void testChat() throws YuanqiException {
+        System.out.println("testChat");
         ChatParams params = new ChatParams();
         params.setAssistantId("NT61p8m6teGx");
         List<Message> messages = new ArrayList<>();

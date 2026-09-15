@@ -17,7 +17,7 @@ import java.security.KeyStore;
  */
 @Data
 public class YuanqiConfig {
-    private static final String DEFAULT_BASE_URL = "https://yuanqi.tencent.com/openapi";
+    private static final String DEFAULT_BASE_URL = "https://yuanqi.tencent.com/openapi/v1/agent/chat/completions";
 
     /**
      * 腾讯元器接口请求地址域名部分.
