@@ -30,7 +30,7 @@ mvn test                   # 不会运行任何测试 —— 根 pom 中 surefir
 
 ## 约定与限制
 
-- **Java 7 编译级别**（`maven.compiler.source=1.7`）。不要使用 lambda、Stream、`var` 等 Java 8+ 语法特性。依赖版本也因此被锁定在较低版本（jodd-http 3.7.1、gson 2.8.0），pom 注释中已有说明 —— 不要随意升级这些依赖。
+- **Java 8 编译级别**（`maven.compiler.source=1.8`，2026-09 从 1.7 升级，因为新版 JDK 已不再支持 source/target 7）。依赖版本仍锁定在较低版本（jodd-http 3.7.1、gson 2.8.0），pom 注释中已有说明 —— 不要随意升级这些依赖。Lombok 已升级到 1.18.34 以兼容新版 JDK，不要再降回 1.18.8。
 - 大量使用 **Lombok**（`@Data`、`@Slf4j`）—— IDE 需开启注解处理。
 - JSON 序列化统一走 Gson 的 `YuanqiGsonBuilder`；bean 的 `toString()` 返回 JSON，并被直接用于构造请求体（如 `AgentServiceImpl.chat` 中的 `params.toString()`）。
 - Checkstyle（google_checks.xml）已配置但被跳过（`<skip>true</skip>`）。
