@@ -1,6 +1,7 @@
 ```shell
 claude
 /init
+claude.md转为中文
 
 [ERROR] COMPILATION ERROR :
 [INFO] -------------------------------------------------------------
