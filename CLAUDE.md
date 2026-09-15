@@ -1,38 +1,38 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 Claude Code (claude.ai/code) 在本仓库中工作时提供指导。
 
-## Project
+## 项目简介
 
-YuanqiJava — a Java SDK for the Tencent Yuanqi (腾讯元器) agent OpenAPI. Group ID `com.github.zhangchunsheng`, version 1.0.2, published to Maven Central via Sonatype OSSRH.
+YuanqiJava —— 腾讯元器（Tencent Yuanqi）智能体 OpenAPI 的 Java SDK。Group ID 为 `com.github.zhangchunsheng`，版本 1.0.2，通过 Sonatype OSSRH 发布到 Maven 中央仓库。
 
-## Build & Test
+## 构建与测试
 
 ```bash
-mvn clean install          # build all modules
-mvn clean package          # build jars without installing
-mvn test                   # runs NO tests — surefire is hard-configured <skip>true</skip> in the root pom
+mvn clean install          # 构建所有模块
+mvn clean package          # 只打包，不安装到本地仓库
+mvn test                   # 不会运行任何测试 —— 根 pom 中 surefire 被硬编码为 <skip>true</skip>
 ```
 
-Tests are skipped by the root pom's surefire configuration (a literal `<skip>true</skip>`, not a property), so they cannot be enabled from the command line with `-DskipTests=false`. Run tests from an IDE, or temporarily remove the skip from `pom.xml`.
+根 pom 的 surefire 配置中写死了字面量 `<skip>true</skip>`（不是属性占位符），因此无法通过命令行 `-DskipTests=false` 开启测试。请在 IDE 中运行测试，或临时修改 `pom.xml` 去掉该配置。
 
-Tests are **TestNG** (not JUnit), wired with Guice: each module's test suite has an `ApiTestModule` that reads `test-config.xml` from the test classpath. Copy `src/test/resources/test-config.sample.xml` to `test-config.xml` and fill in a real Yuanqi API key — the tests in `BaseYuanqiAgentServiceImplTest` hit the live API (`https://yuanqi.tencent.com/openapi`), they are not mocked. Do not commit `test-config.xml`.
+测试使用 **TestNG**（不是 JUnit），通过 Guice 装配：每个模块的测试都依赖 `ApiTestModule`，它从测试 classpath 读取 `test-config.xml`。请复制 `src/test/resources/test-config.sample.xml` 为 `test-config.xml` 并填入真实的元器 API key —— `BaseYuanqiAgentServiceImplTest` 中的测试会真实请求线上接口（`https://yuanqi.tencent.com/openapi`），并非 mock。切勿提交 `test-config.xml`。
 
-## Architecture
+## 架构
 
-Three Maven modules (build order matters, install before using downstream):
+三个 Maven 模块（构建顺序有依赖关系，下游使用前请先 install）：
 
-- **`yuanqi-java-common`** (package `me.zhangchunsheng.yuanqi.common`) — transport layer. `YuanqiService` is the base interface (get/post/postJson/postForBytes); `BaseServiceImpl` holds shared state (`YuanqiConfig`, a `ThreadLocal<YuanqiApiData>` request log); two HTTP implementations exist: `YuanqiServiceApacheHttpImpl` (Apache HttpClient, the default) and `YuanqiServiceJoddHttpImpl` (jodd-http). `YuanqiServiceImpl` is just a subclass of the Apache one. Also contains `YuanqiConfig` (baseUrl, timeouts, API key, HTTP proxy settings), `YuanqiConstants` (endpoint paths), `YuanqiException`, `BaseYuanqiResult` (Gson deserialization, `isSuccess()` = non-empty `id`), and `YuanqiGsonBuilder`.
-- **`yuanqi-java-agent`** (package `com.github.zhangchunsheng.yuanqiagent`) — the agent chat API. `AgentService` / `AgentServiceImpl` expose `chat(ChatParams) -> ChatRet`, which POSTs JSON to `baseUrl + /v1/agent/chat/completions` with `X-Source: openapi` and `Authorization: Bearer <key>` headers. Request/response beans live under `bean/request` and `bean/result`.
-- **`spring-boot-starters/yuanqi-java-agent-spring-boot-starter`** — Spring Boot 2.1 auto-configuration registered via `META-INF/spring.factories`. `YuanqiAgentAutoConfiguration` creates an `AgentService` bean from `yuanqi.*` properties (`yuanqi.key` in application.yml; `yuanqi.enabled=false` disables it).
+- **`yuanqi-java-common`**（包名 `me.zhangchunsheng.yuanqi.common`）—— 传输层。`YuanqiService` 是基础接口（get/post/postJson/postForBytes）；`BaseServiceImpl` 持有共享状态（`YuanqiConfig`、用于记录请求日志的 `ThreadLocal<YuanqiApiData>`）；HTTP 实现有两种：`YuanqiServiceApacheHttpImpl`（Apache HttpClient，默认实现）和 `YuanqiServiceJoddHttpImpl`（jodd-http）。`YuanqiServiceImpl` 只是 Apache 实现的子类。本模块还包含 `YuanqiConfig`（baseUrl、超时、API key、HTTP 代理设置）、`YuanqiConstants`（接口路径常量）、`YuanqiException`、`BaseYuanqiResult`（Gson 反序列化，`isSuccess()` 即 `id` 非空）和 `YuanqiGsonBuilder`。
+- **`yuanqi-java-agent`**（包名 `com.github.zhangchunsheng.yuanqiagent`）—— 智能体对话 API。`AgentService` / `AgentServiceImpl` 提供 `chat(ChatParams) -> ChatRet`，向 `baseUrl + /v1/agent/chat/completions` 发送 JSON POST 请求，请求头带 `X-Source: openapi` 和 `Authorization: Bearer <key>`。请求/响应 bean 位于 `bean/request` 和 `bean/result` 包下。
+- **`spring-boot-starters/yuanqi-java-agent-spring-boot-starter`** —— Spring Boot 2.1 自动配置，通过 `META-INF/spring.factories` 注册。`YuanqiAgentAutoConfiguration` 根据 `yuanqi.*` 配置项创建 `AgentService` Bean（在 application.yml 中配置 `yuanqi.key`；`yuanqi.enabled=false` 可关闭）。
 
-Note the package split: common uses `me.zhangchunsheng.*` while agent/starter use `com.github.zhangchunsheng.*` — both are intentional, match the module you're editing.
+注意包名差异：common 模块用 `me.zhangchunsheng.*`，agent/starter 模块用 `com.github.zhangchunsheng.*` —— 两者都是有意为之，改动哪个模块就沿用哪个包名。
 
-## Conventions & Constraints
+## 约定与限制
 
-- **Java 7 source/target** (`maven.compiler.source=1.7`). Do not use lambdas, streams, `var`, or other Java 8+ language features. Dependency versions are pinned low for this reason (jodd-http 3.7.1, gson 2.8.0); the pom comments call this out — don't upgrade them casually.
-- **Lombok** is used heavily (`@Data`, `@Slf4j`) — annotation processing must be enabled in the IDE.
-- JSON serialization is Gson via `YuanqiGsonBuilder`; beans' `toString()` returns JSON and is used to build request bodies (e.g. `params.toString()` in `AgentServiceImpl.chat`).
-- Checkstyle (google_checks.xml) is configured but skipped (`<skip>true</skip>`).
-- Releasing uses the `release` profile (source/javadoc jars + GPG signing) and nexus-staging to Sonatype; versions across all modules are kept in sync via `autoVersionSubmodules`.
-- Some javadoc/comments are copy-pasted from an earlier location-service project (e.g. "地理/逆地理编码", "电费请求实现类") and don't match what the code does — treat code, not comments, as truth.
+- **Java 7 编译级别**（`maven.compiler.source=1.7`）。不要使用 lambda、Stream、`var` 等 Java 8+ 语法特性。依赖版本也因此被锁定在较低版本（jodd-http 3.7.1、gson 2.8.0），pom 注释中已有说明 —— 不要随意升级这些依赖。
+- 大量使用 **Lombok**（`@Data`、`@Slf4j`）—— IDE 需开启注解处理。
+- JSON 序列化统一走 Gson 的 `YuanqiGsonBuilder`；bean 的 `toString()` 返回 JSON，并被直接用于构造请求体（如 `AgentServiceImpl.chat` 中的 `params.toString()`）。
+- Checkstyle（google_checks.xml）已配置但被跳过（`<skip>true</skip>`）。
+- 发布使用 `release` profile（source/javadoc jar + GPG 签名），经 nexus-staging 推送到 Sonatype；各模块版本通过 `autoVersionSubmodules` 保持一致。
+- 部分 javadoc/注释是从早期的位置服务项目复制过来的（如“地理/逆地理编码”、“电费请求实现类”），与代码实际功能不符 —— 请以代码为准，不要轻信注释。
